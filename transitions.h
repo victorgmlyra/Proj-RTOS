@@ -1,6 +1,6 @@
 #ifndef TRANSITIONS_H
 #define TRANSITIONS_H
-
+//dapifjsdpováhovh
 #include "event.h"
 #include "sm.h"
 
