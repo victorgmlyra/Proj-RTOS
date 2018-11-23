@@ -5,39 +5,39 @@
 #include "sm.h"
 
 
-cb_status s_cb(event_t ev);
-cb_status s1_cb(event_t ev);
-cb_status s11_cb(event_t ev);
+cb_status principal(event_t ev);
+cb_status aguardo(event_t ev);
+cb_status entrada(event_t ev);
 cb_status s2_cb(event_t ev);
 cb_status s21_cb(event_t ev);
 cb_status s211_cb(event_t ev);
 
 
 #define Topo_init_tran() do {                   \
-                push_state(s_cb);               \
+                push_state(principal);               \
                 dispatch(ENTRY_EVENT);          \
                 push_state(s2_cb);              \
                 dispatch(ENTRY_EVENT);          \
                 dispatch(INIT_EVENT);           \
         } while (0)
 
-#define s_init_tran() do {                      \
-                push_state(s1_cb);              \
+#define principal_init_tran() do {                      \
+                push_state(aguardo);              \
                 dispatch(ENTRY_EVENT);          \
-                push_state(s11_cb);             \
+                push_state(entrada);             \
                 dispatch(ENTRY_EVENT);          \
         } while (0)
 
 #define s_s11_local_tran() do {                 \
                 exit_inner_states();            \
-                push_state(s1_cb);              \
+                push_state(aguardo);              \
                 dispatch(ENTRY_EVENT);          \
-                push_state(s11_cb);             \
+                push_state(entrada);             \
                 dispatch(ENTRY_EVENT);          \
         } while (0)
 
 #define s1_init_tran() do {                     \
-                push_state(s11_cb);             \
+                push_state(entrada);             \
                 dispatch(ENTRY_EVENT);          \
         } while (0)
 
@@ -57,7 +57,7 @@ cb_status s211_cb(event_t ev);
 
 #define s1_s11_local_tran() do {                \
                 exit_inner_states();            \
-                push_state(s11_cb);             \
+                push_state(entrada);             \
                 dispatch(ENTRY_EVENT);          \
         } while (0)
 
@@ -116,7 +116,7 @@ cb_status s211_cb(event_t ev);
 #define s2_s1_tran() do {                       \
                 exit_inner_states();            \
                 dispatch(EXIT_EVENT);           \
-                replace_state(s1_cb);           \
+                replace_state(aguardo);           \
                 dispatch(ENTRY_EVENT);          \
                 dispatch(INIT_EVENT);           \
         } while(0)
@@ -124,9 +124,9 @@ cb_status s211_cb(event_t ev);
 #define s2_s11_tran() do {                      \
                 exit_inner_states();            \
                 dispatch(EXIT_EVENT);           \
-                replace_state(s1_cb);           \
+                replace_state(aguardo);           \
                 dispatch(ENTRY_EVENT);          \
-                push_state(s11_cb);             \
+                push_state(entrada);             \
                 dispatch(ENTRY_EVENT);          \
         } while(0)
 
@@ -153,9 +153,9 @@ cb_status s211_cb(event_t ev);
                 dispatch(EXIT_EVENT);           \
                 pop_state();                    \
                 dispatch(EXIT_EVENT);           \
-                replace_state(s1_cb);           \
+                replace_state(aguardo);           \
                 dispatch(ENTRY_EVENT);          \
-                push_state(s11_cb);             \
+                push_state(entrada);             \
                 dispatch(ENTRY_EVENT);          \
         } while(0)
 

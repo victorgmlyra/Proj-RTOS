@@ -7,125 +7,88 @@
 
 
 enum {
-        EVENT_A = USER_EVENT,
-        EVENT_B,
+        EVENT_A1 = USER_EVENT,
+        EVENT_A2,
+        EVENT_B1,
+        EVENT_B2,
         EVENT_C,
+        EVENT_R,
         EVENT_D,
-        EVENT_E,
-        EVENT_F,
-        EVENT_G,
-        EVENT_H,
-        EVENT_I
+        EVENT_N
 };
 
 uint8_t foo;
 
 cb_status init_cb(event_t ev)
 {
-        foo = 0;
-        printf("top-INIT;");
+        printf("Hermano eh um bom companheiro");
         Topo_init_tran();
         return EVENT_HANDLED;
 }
 
-cb_status s_cb(event_t ev)
+cb_status principal(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("s-ENTRY;");
+                printf("entrada-ENTRY;");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("s-EXIT;");
+                printf("entrada-EXIT;");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("s-INIT;");
-                s_init_tran();
+                printf("entrada-INIT;");
+                principal_init_tran();
                 return EVENT_HANDLED;
-        case EVENT_I:
-                if (foo) {
-                        foo = 0;
-                        printf("s-I;");
-                        return EVENT_HANDLED;
-                }
-                break;
-        case EVENT_E:
-                printf("s-E;");
-                s_s11_local_tran();
+        case EVENT_B2:
+                printf("entrada-B2;");
+                principal_adm_tran();                   //Transição principal->ADM *nao feito ainda
+                return EVENT_HANDLED;
+        case EVENT_B1:
+                printf("entrada-B1;");
+                principal_block_tran();                 //Transição principal->block *nao feito ainda
                 return EVENT_HANDLED;
         }
 
         return EVENT_NOT_HANDLED;
 }
 
-cb_status s1_cb(event_t ev)
+cb_status aguardo(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("s1-ENTRY;");
+                printf("aguardo-ENTRY;");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("s1-EXIT;");
+                printf("aguardo-EXIT;");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("s1-INIT;");
-                s1_init_tran();
+                printf("aguardo-INIT;");
                 return EVENT_HANDLED;
-        case EVENT_A:
-                printf("s1-A;");
-                s1_s1_tran();
+        case EVENT_A1:
+                printf("aguardo-A;");
+                aguardo_entrada_tran();
                 return EVENT_HANDLED;
-        case EVENT_B:
-                printf("s1-B;");
-                s1_s11_local_tran();
-                return EVENT_HANDLED;
-        case EVENT_C:
-                printf("s1-C;");
-                s1_s2_tran();
-                return EVENT_HANDLED;
-        case EVENT_D:
-                if (!foo) {
-                        foo = 1;
-                        printf("s1-D;");
-                        s1_s_local_tran();
-                        return EVENT_HANDLED;
-                }
-                break;
-        case EVENT_F:
-                printf("s1-F;");
-                s1_s211_tran();
-                return EVENT_HANDLED;
-        case EVENT_I:
-                printf("s1-I;");
+        case EVENT_A2:
+                printf("aguardo-A2;");
+                aguardo_saida_tran();
                 return EVENT_HANDLED;
         }
 
         return EVENT_NOT_HANDLED;
 }
 
-cb_status s11_cb(event_t ev)
+cb_status entrada(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("s11-ENTRY;");
+                printf("entrada-ENTRY;");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("s11-EXIT;");
+                printf("entrada-EXIT;");
                 return EVENT_HANDLED;
-        case EVENT_D:
-                if (foo) {
-                        foo = 0;
-                        printf("s11-D;");
-                        s11_s1_local_tran();
-                        return EVENT_HANDLED;
-                }
-                break;
-        case EVENT_G:
-                printf("s11-G;");
-                s11_s211_tran();
-                return EVENT_HANDLED;
-        case EVENT_H:
-                printf("s11-H;");
-                s11_s_local_tran();
+        case INIT_EVENT:
+                printf("entrada-INIT");
+                entrada_principal_local_tran();
                 return EVENT_HANDLED;
         }
 
