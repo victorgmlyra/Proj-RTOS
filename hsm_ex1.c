@@ -6,6 +6,8 @@
 #include "transitions.h"
 
 
+//terminar a parada que tem no fim.
+
 enum {
         EVENT_A1 = USER_EVENT,
         EVENT_A2,
