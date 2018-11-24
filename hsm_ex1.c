@@ -52,7 +52,7 @@ cb_status principal(event_t ev)
         return EVENT_NOT_HANDLED;
 }
 
-cb_status aguardo(event_t ev)
+cb_status aguardo(event_t ev)8
 {
         switch(ev) {
         case ENTRY_EVENT:
@@ -95,90 +95,190 @@ cb_status entrada(event_t ev)
         return EVENT_NOT_HANDLED;
 }
 
-cb_status s2_cb(event_t ev)
+cb_status saida(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("s2-ENTRY;");
+                printf("saida-ENTRY;");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("s2-EXIT;");
+                printf("saida-EXIT;");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("s2-INIT;");
-                s2_init_tran();
+                printf("saida-INIT;");
+                saida_principal_tran();
+                return EVENT_HANDLED;
+        }
+
+        return EVENT_NOT_HANDLED;
+}
+
+cb_status adm(event_t ev)
+{
+        switch(ev) {
+        case ENTRY_EVENT:
+                printf("adm-ENTRY;");
+                return EVENT_HANDLED;
+        case EXIT_EVENT:
+                printf("adm-EXIT;");
+                return EVENT_HANDLED;
+        case INIT_EVENT:
+                printf("adm-INIT;");
+                return EVENT_HANDLED;
+        case EVENT_B2:
+                printf("adm-B2;");
+                adm_principal_tran();                   
+                return EVENT_HANDLED;
+        case EVENT_B1:
+                printf("adm-B1;");
+                adm_block_tran();                 
                 return EVENT_HANDLED;
         case EVENT_C:
-                printf("s2-C;");
-                s2_s1_tran();
+                printf("adm-C;");
+                adm_cadastrar_tran();
                 return EVENT_HANDLED;
-        case EVENT_F:
-                printf("s2-F;");
-                s2_s11_tran();
+        }
+        case EVENT_R:
+                printf("adm-R;");
+                adm_remover_tran();
                 return EVENT_HANDLED;
-        case EVENT_I:
-                if (!foo) {
-                        foo = 1;
-                        printf("s2-I;");
-                        return EVENT_HANDLED;
-                }
-                break;
+        }
+        case EVENT_D:
+                printf("adm-D;");
+                adm_download_tran();
+                return EVENT_HANDLED;
         }
 
         return EVENT_NOT_HANDLED;
 }
 
-cb_status s21_cb(event_t ev)
+cb_status cadastrar(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("s21-ENTRY;");
+                printf("cadastrar-ENTRY;");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("s21-EXIT;");
+                printf("cadastrar-EXIT;");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("s21-INIT;");
-                s21_init_tran();
-                return EVENT_HANDLED;
-        case EVENT_A:
-                printf("s21-A;");
-                s21_s21_tran();
-                return EVENT_HANDLED;
-        case EVENT_B:
-                printf("s21-B;");
-                s21_s211_local_tran();
-                return EVENT_HANDLED;
-        case EVENT_G:
-                printf("s21-G;");
-                s21_s11_tran();
+                printf("cadastrar-INIT;");
+                return EVENT_HANDLED;   
+        case EVENT_A1:
+                printf("cadastrar-A;");
+                cadastrar_finalizar_tran();
                 return EVENT_HANDLED;
         }
 
         return EVENT_NOT_HANDLED;
 }
 
-cb_status s211_cb(event_t ev)
+cb_status finalizar(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("s211-ENTRY;");
+                printf("finalizar-ENTRY;");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("s211-EXIT;");
+                printf("finalizar-EXIT;");
                 return EVENT_HANDLED;
-        case EVENT_D:
-                printf("s211-D;");
-                s211_s21_local_tran();
-                return EVENT_HANDLED;
-        case EVENT_H:
-                printf("s211-H;");
-                s211_s_local_tran();
+        case INIT_EVENT:
+                printf("finalizar-INIT;");
+                return EVENT_HANDLED;   
+        case EVENT_N:
+                printf("finalzar-N;");
+                finalizar_adm_tran();
                 return EVENT_HANDLED;
         }
 
         return EVENT_NOT_HANDLED;
 }
+
+
+cb_status remover(event_t ev)
+{
+        switch(ev) {
+        case ENTRY_EVENT:
+                printf("remover-ENTRY;");
+                return EVENT_HANDLED;
+        case EXIT_EVENT:
+                printf("remover-EXIT;");
+                return EVENT_HANDLED;
+        case INIT_EVENT:
+                printf("remover-INIT;");
+                return EVENT_HANDLED;              
+        case EVENT_N:
+                printf("remover-N;");
+                remover_confirmacao_tran();
+                return EVENT_HANDLED;
+        }
+
+cb_status confirmacao(event_t ev)
+{
+        switch(ev) {
+        case ENTRY_EVENT:
+                printf("confirmacao-ENTRY;");
+                return EVENT_HANDLED;
+        case EXIT_EVENT:
+                printf("confirmacao-EXIT;");
+                return EVENT_HANDLED;
+        case INIT_EVENT:
+                printf("confirmacao-INIT;");
+                confirmacao_adm_tran();
+                return EVENT_HANDLED;              
+        }
+
+        return EVENT_NOT_HANDLED;
+}
+
+cb_status download(event_t ev)
+{
+        switch(ev) {
+        case ENTRY_EVENT:
+                printf("download-ENTRY;");
+                return EVENT_HANDLED;
+        case EXIT_EVENT:
+                printf("download-EXIT;");
+                return EVENT_HANDLED;
+        case INIT_EVENT:
+                printf("download-INIT;");
+                download_adm_tran();
+                return EVENT_HANDLED;              
+        }
+
+        return EVENT_NOT_HANDLED;
+}
+
+cb_status bloqueado(event_t ev)
+{
+        switch(ev) {
+        case ENTRY_EVENT:
+                printf("bloqueado-ENTRY;");
+                return EVENT_HANDLED;
+        case EXIT_EVENT:
+                printf("bloqueado-EXIT;");
+                return EVENT_HANDLED;
+        case INIT_EVENT:
+                printf("bloqueado-INIT;");
+                return EVENT_HANDLED;              
+        case EVENT_A1:
+                printf("bloqueado-A1;");
+                bloqueado_negado_tran();                
+                return EVENT_HANDLED;
+        case EVENT_A2:
+                printf("bloqueado-A2;");
+                bloqueado_negado_tran();
+                return EVENT_HANDLED;
+        }
+        case EVENT_B1:
+                printf("bloqueado-B1;");
+                bloqueado_principal_tran();
+                return EVENT_HANDLED;
+        }
+
+        return EVENT_NOT_HANDLED;
+}
+
 
 
 pthread_mutex_t handling_mutex;
