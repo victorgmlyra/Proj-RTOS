@@ -6,7 +6,6 @@
 #include "transitions.h"
 
 
-//terminar a parada que tem no fim.
 
 enum {
         EVENT_A1 = USER_EVENT,
@@ -54,7 +53,7 @@ cb_status principal(event_t ev)
         return EVENT_NOT_HANDLED;
 }
 
-cb_status aguardo(event_t ev)8
+cb_status aguardo(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
@@ -324,13 +323,21 @@ int main(int argc, char* argv[])
         ptr = argv[1];
         while(*ptr) {
                 switch (*ptr++) {
-                case 'A':
-                case 'a':
-                        set_event(EVENT_A);
+                case 'A1':
+                case 'a1':
+                        set_event(EVENT_A1);
+                        break;
+                case 'A2':
+                case 'a2':
+                        set_event(EVENT_A2);
                         break;
                 case 'B':
                 case 'b':
-                        set_event(EVENT_B);
+                        set_event(EVENT_B1);
+                        break;
+                case 'B2':
+                case 'b2':
+                        set_event(EVENT_B2);
                         break;
                 case 'C':
                 case 'c':
@@ -340,30 +347,22 @@ int main(int argc, char* argv[])
                 case 'd':
                         set_event(EVENT_D);
                         break;
-                case 'E':
-                case 'e':
-                        set_event(EVENT_E);
+                case 'R':
+                case 'r':
+                        set_event(EVENT_R);
                         break;
-                case 'F':
-                case 'f':
-                        set_event(EVENT_F);
+                case 'N':
+                case 'n':
+                        set_event(EVENT_N);
                         break;
-                case 'G':
-                case 'g':
-                        set_event(EVENT_G);
-                        break;
-                case 'H':
-                case 'h':
-                        set_event(EVENT_H);
-                        break;
-                case 'I':
+        /*      case 'I':
                 case 'i':
                         set_event(EVENT_I);
                         break;
                 default:
                         set_event(EVENT_I+1);
                         /* continue; */
-                }
+                } 
                 pthread_mutex_lock(&handling_mutex);
                 pthread_cond_wait(&handling_cv, &handling_mutex);
                 pthread_mutex_unlock(&handling_mutex);

@@ -1,6 +1,5 @@
 #ifndef TRANSITIONS_H
 #define TRANSITIONS_H
-//dapifjsdpováhovh
 #include "event.h"
 #include "sm.h"
 
@@ -28,7 +27,7 @@ cb_status s211_cb(event_t ev);
                 dispatch(ENTRY_EVENT);          \
         } while (0)
 
-#define s_s11_local_tran() do {                 \
+#define principal_adm_tran() do {                 \
                 exit_inner_states();            \
                 push_state(aguardo);              \
                 dispatch(ENTRY_EVENT);          \
@@ -36,32 +35,32 @@ cb_status s211_cb(event_t ev);
                 dispatch(ENTRY_EVENT);          \
         } while (0)
 
-#define s1_init_tran() do {                     \
+#define principal_block_tran() do {                     \
                 push_state(entrada);             \
                 dispatch(ENTRY_EVENT);          \
         } while (0)
 
-#define s1_s_local_tran() do {                  \
+#define aguardo_entrada_tran() do {                  \
                 exit_inner_states();            \
                 dispatch(EXIT_EVENT);           \
                 pop_state();                    \
                 dispatch(INIT_EVENT);           \
         } while (0)
 
-#define s1_s1_tran() do {                       \
+#define aguardo_saida_tran() do {                       \
                 exit_inner_states();            \
                 dispatch(EXIT_EVENT);           \
                 dispatch(ENTRY_EVENT);          \
                 dispatch(INIT_EVENT);           \
         } while (0)
 
-#define s1_s11_local_tran() do {                \
+#define entrada_principal_local_tran() do {                \
                 exit_inner_states();            \
                 push_state(entrada);             \
                 dispatch(ENTRY_EVENT);          \
         } while (0)
 
-#define s1_s2_tran() do {                       \
+#define saida_principal_tran() do {                       \
                 exit_inner_states();            \
                 dispatch(EXIT_EVENT);           \
                 replace_state(s2_cb);           \
@@ -69,34 +68,8 @@ cb_status s211_cb(event_t ev);
                 dispatch(INIT_EVENT);           \
         } while (0)
 
-#define s1_s211_tran() do {                     \
+#define adm_principal_tran() do {                     \
                 exit_inner_states();            \
-                dispatch(EXIT_EVENT);           \
-                replace_state(s2_cb);           \
-                dispatch(ENTRY_EVENT);          \
-                push_state(s21_cb);             \
-                dispatch(ENTRY_EVENT);          \
-                push_state(s211_cb);            \
-                dispatch(ENTRY_EVENT);          \
-        } while (0)
-
-#define s11_s_local_tran() do {                 \
-                dispatch(EXIT_EVENT);           \
-                pop_state();                    \
-                dispatch(EXIT_EVENT);           \
-                pop_state();                    \
-                dispatch(INIT_EVENT);           \
-        } while(0)
-
-#define s11_s1_local_tran() do {                \
-                dispatch(EXIT_EVENT);           \
-                pop_state();                    \
-                dispatch(INIT_EVENT);           \
-        } while(0)
-
-#define s11_s211_tran() do {                    \
-                dispatch(EXIT_EVENT);           \
-                pop_state();                    \
                 dispatch(EXIT_EVENT);           \
                 replace_state(s2_cb);           \
                 dispatch(ENTRY_EVENT);          \
@@ -106,49 +79,75 @@ cb_status s211_cb(event_t ev);
                 dispatch(ENTRY_EVENT);          \
         } while (0)
 
-#define s2_init_tran() do {                     \
+#define adm_block_tran()  do {                 \
+                dispatch(EXIT_EVENT);           \
+                pop_state();                    \
+                dispatch(EXIT_EVENT);           \
+                pop_state();                    \
+                dispatch(INIT_EVENT);           \
+        } while(0)
+
+#define adm_cadastrar_tran() do {                \
+                dispatch(EXIT_EVENT);           \
+                pop_state();                    \
+                dispatch(INIT_EVENT);           \
+        } while(0)
+
+#define adm_remover_tran() do {                    \
+                dispatch(EXIT_EVENT);           \
+                pop_state();                    \
+                dispatch(EXIT_EVENT);           \
+                replace_state(s2_cb);           \
+                dispatch(ENTRY_EVENT);          \
                 push_state(s21_cb);             \
                 dispatch(ENTRY_EVENT);          \
                 push_state(s211_cb);            \
                 dispatch(ENTRY_EVENT);          \
         } while (0)
 
-#define s2_s1_tran() do {                       \
-                exit_inner_states();            \
-                dispatch(EXIT_EVENT);           \
-                replace_state(aguardo);           \
+#define adm_download_tran() do {                     \
+                push_state(s21_cb);             \
                 dispatch(ENTRY_EVENT);          \
-                dispatch(INIT_EVENT);           \
-        } while(0)
-
-#define s2_s11_tran() do {                      \
-                exit_inner_states();            \
-                dispatch(EXIT_EVENT);           \
-                replace_state(aguardo);           \
-                dispatch(ENTRY_EVENT);          \
-                push_state(entrada);             \
-                dispatch(ENTRY_EVENT);          \
-        } while(0)
-
-#define s21_init_tran() do {                    \
                 push_state(s211_cb);            \
                 dispatch(ENTRY_EVENT);          \
         } while (0)
 
-#define s21_s21_tran() do {                     \
+#define cadastrar_finalizar_tran() do {                       \
+                exit_inner_states();            \
+                dispatch(EXIT_EVENT);           \
+                replace_state(aguardo);           \
+                dispatch(ENTRY_EVENT);          \
+                dispatch(INIT_EVENT);           \
+        } while(0)
+
+#define finalizar_adm_tran() do {                      \
+                exit_inner_states();            \
+                dispatch(EXIT_EVENT);           \
+                replace_state(aguardo);           \
+                dispatch(ENTRY_EVENT);          \
+                push_state(entrada);             \
+                dispatch(ENTRY_EVENT);          \
+        } while(0)
+
+#define remover_confirmacao_tran() do {                    \
+                push_state(s211_cb);            \
+                dispatch(ENTRY_EVENT);          \
+        } while (0)
+
+#define confirmacao_adm_tran() do {                     \
                 exit_inner_states();            \
                 dispatch(EXIT_EVENT);           \
                 dispatch(ENTRY_EVENT);          \
                 dispatch(INIT_EVENT);           \
         } while(0)
 
-#define s21_s211_local_tran() do {              \
+#define download_adm_tran() do {              \
                 exit_inner_states();            \
                 push_state(s211_cb);            \
                 dispatch(ENTRY_EVENT);          \
         } while(0)
 
-#define s21_s11_tran() do {                     \
+#define bloqueado_negado_tran() do {                     \
                 exit_inner_states();            \
                 dispatch(EXIT_EVENT);           \
                 pop_state();                    \
@@ -159,17 +158,11 @@ cb_status s211_cb(event_t ev);
                 dispatch(ENTRY_EVENT);          \
         } while(0)
 
-#define s211_s_local_tran() do {                \
+#define bloqueado_principal_tran() do {                \
                 dispatch(EXIT_EVENT);           \
                 pop_state();                    \
                 dispatch(EXIT_EVENT);           \
                 pop_state();                    \
-                dispatch(EXIT_EVENT);           \
-                pop_state();                    \
-                dispatch(INIT_EVENT);           \
-        } while(0)
-
-#define s211_s21_local_tran() do {              \
                 dispatch(EXIT_EVENT);           \
                 pop_state();                    \
                 dispatch(INIT_EVENT);           \
