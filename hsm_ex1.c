@@ -8,21 +8,19 @@
 
 
 enum {
-        EVENT_A1 = USER_EVENT,
-        EVENT_A2,
-        EVENT_B1,
-        EVENT_B2,
-        EVENT_C,
-        EVENT_R,
-        EVENT_D,
-        EVENT_N
+        EVENT_E = USER_EVENT,           // Entrada com cartão comum
+        EVENT_S,                        // Saída com cartão comum 
+        EVENT_A,                        // Entrada com cartão adm
+        EVENT_B,                        // Saída com cartão adm
+        EVENT_C,                        // Evento de cadastro
+        EVENT_R,                        // Evento de remover cadastro
+        EVENT_D,                        // Evento de download do ponto
+        EVENT_N                         // Evento de envio de nome
 };
-
-uint8_t foo;
 
 cb_status init_cb(event_t ev)
 {
-        printf("Hermano eh um bom companheiro");
+        printf("Hermano eh um bom companheiro \n");
         Topo_init_tran();
         return EVENT_HANDLED;
 }
@@ -31,22 +29,22 @@ cb_status principal(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("entrada-ENTRY;");
+                printf("principal-ENTRY; \n");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("entrada-EXIT;");
+                printf("principal-EXIT; \n");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("entrada-INIT;");
+                printf("principal-INIT; \n");
                 principal_init_tran();
                 return EVENT_HANDLED;
-        case EVENT_B2:
-                printf("entrada-B2;");
-                principal_adm_tran();                   //Transição principal->ADM *nao feito ainda
+        case EVENT_B:
+                printf("principal-B; \n");
+                principal_adm_tran();                   
                 return EVENT_HANDLED;
-        case EVENT_B1:
-                printf("entrada-B1;");
-                principal_block_tran();                 //Transição principal->block *nao feito ainda
+        case EVENT_A:
+                printf("principal-A; \n");
+                principal_block_tran();                 
                 return EVENT_HANDLED;
         }
 
@@ -57,20 +55,20 @@ cb_status aguardo(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("aguardo-ENTRY;");
+                printf("aguardo-ENTRY; \n");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("aguardo-EXIT;");
+                printf("aguardo-EXIT; \n");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("aguardo-INIT;");
+                printf("aguardo-INIT; \n");
                 return EVENT_HANDLED;
-        case EVENT_A1:
-                printf("aguardo-A;");
+        case EVENT_E:
+                printf("aguardo-E; \n");
                 aguardo_entrada_tran();
                 return EVENT_HANDLED;
-        case EVENT_A2:
-                printf("aguardo-A2;");
+        case EVENT_S:
+                printf("aguardo-S; \n");
                 aguardo_saida_tran();
                 return EVENT_HANDLED;
         }
@@ -82,10 +80,10 @@ cb_status entrada(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("entrada-ENTRY;");
+                printf("entrada-ENTRY; \n");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("entrada-EXIT;");
+                printf("entrada-EXIT; \n");
                 return EVENT_HANDLED;
         case INIT_EVENT:
                 printf("entrada-INIT");
@@ -100,13 +98,13 @@ cb_status saida(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("saida-ENTRY;");
+                printf("saida-ENTRY; \n");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("saida-EXIT;");
+                printf("saida-EXIT; \n");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("saida-INIT;");
+                printf("saida-INIT; \n");
                 saida_init_tran();
                 return EVENT_HANDLED;
         }
@@ -118,32 +116,32 @@ cb_status adm(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("adm-ENTRY;");
+                printf("adm-ENTRY; \n");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("adm-EXIT;");
+                printf("adm-EXIT; \n");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("adm-INIT;");
+                printf("adm-INIT; \n");
                 return EVENT_HANDLED;
-        case EVENT_B2:
-                printf("adm-B2;");
+        case EVENT_B:
+                printf("adm-B; \n");
                 adm_principal_tran();                  
                 return EVENT_HANDLED;
-        case EVENT_B1:
-                printf("adm-B1;");
+        case EVENT_A:
+                printf("adm-A; \n");
                 adm_block_tran();                 
                 return EVENT_HANDLED;
         case EVENT_C:
-                printf("adm-C;");
+                printf("adm-C; \n");
                 adm_cadastrar_local_tran();
                 return EVENT_HANDLED;
         case EVENT_R:
-                printf("adm-R;");
+                printf("adm-R; \n");
                 adm_remover_local_tran();
                 return EVENT_HANDLED;
         case EVENT_D:
-                printf("adm-D;");
+                printf("adm-D; \n");
                 adm_download_local_tran();
                 return EVENT_HANDLED;
         }
@@ -155,16 +153,16 @@ cb_status cadastrar(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("cadastrar-ENTRY;");
+                printf("cadastrar-ENTRY; \n");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("cadastrar-EXIT;");
+                printf("cadastrar-EXIT; \n");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("cadastrar-INIT;");
+                printf("cadastrar-INIT; \n");
                 return EVENT_HANDLED;   
-        case EVENT_A1:
-                printf("cadastrar-A;");
+        case EVENT_E:
+                printf("cadastrar-E; \n");
                 cadastrar_finalizar_local_tran();
                 return EVENT_HANDLED;
         }
@@ -176,16 +174,16 @@ cb_status finalizar(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("finalizar-ENTRY;");
+                printf("finalizar-ENTRY; \n");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("finalizar-EXIT;");
+                printf("finalizar-EXIT; \n");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("finalizar-INIT;");
+                printf("finalizar-INIT; \n");
                 return EVENT_HANDLED;   
         case EVENT_N:
-                printf("finalzar-N;");
+                printf("finalzar-N; \n");
                 finalizar_adm_local_tran();
                 return EVENT_HANDLED;
         }
@@ -198,32 +196,34 @@ cb_status remover(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("remover-ENTRY;");
+                printf("remover-ENTRY; \n");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("remover-EXIT;");
+                printf("remover-EXIT; \n");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("remover-INIT;");
+                printf("remover-INIT; \n");
                 return EVENT_HANDLED;              
         case EVENT_N:
-                printf("remover-N;");
+                printf("remover-N; \n");
                 remover_confirmacao_local_tran();
                 return EVENT_HANDLED;
         }
+
+        return EVENT_NOT_HANDLED;
 }
 
 cb_status confirmacao(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("confirmacao-ENTRY;");
+                printf("confirmacao-ENTRY; \n");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("confirmacao-EXIT;");
+                printf("confirmacao-EXIT; \n");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("confirmacao-INIT;");
+                printf("confirmacao-INIT; \n");
                 confirmacao_init_tran();
                 return EVENT_HANDLED;              
         }
@@ -235,13 +235,13 @@ cb_status download(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("download-ENTRY;");
+                printf("download-ENTRY; \n");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("download-EXIT;");
+                printf("download-EXIT; \n");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("download-INIT;");
+                printf("download-INIT; \n");
                 download_init_tran();
                 return EVENT_HANDLED;              
         }
@@ -253,20 +253,20 @@ cb_status block(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("block-ENTRY;");
+                printf("block-ENTRY; \n");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("block-EXIT;");
+                printf("block-EXIT; \n");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("block-INIT;");
+                printf("block-INIT; \n");
                 return EVENT_HANDLED;              
-        case EVENT_A1:
-                printf("block-A1;");
+        case EVENT_E:
+                printf("block-E; \n");
                 block_negado_local_tran();                
                 return EVENT_HANDLED;
-        case EVENT_B1:
-                printf("block-B1;");
+        case EVENT_A:
+                printf("block-A; \n");
                 block_principal_tran();
                 return EVENT_HANDLED;
         }
@@ -278,13 +278,13 @@ cb_status negado(event_t ev)
 {
         switch(ev) {
         case ENTRY_EVENT:
-                printf("negado-ENTRY;");
+                printf("negado-ENTRY; \n");
                 return EVENT_HANDLED;
         case EXIT_EVENT:
-                printf("negado-EXIT;");
+                printf("negado-EXIT; \n");
                 return EVENT_HANDLED;
         case INIT_EVENT:
-                printf("negado-INIT;");
+                printf("negado-INIT; \n");
                 negado_init_tran();
                 return EVENT_HANDLED;              
         }
@@ -317,7 +317,7 @@ void *event_thread(void *vargp)
 }
 
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[])   
 {
         char *ptr;
         pthread_t tid;
@@ -335,21 +335,21 @@ int main(int argc, char* argv[])
         ptr = argv[1];
         while(*ptr) {
                 switch (*ptr++) {
-                case 'A1':
-                case 'a1':
-                        set_event(EVENT_A1);
+                case 'E':
+                case 'e':
+                        set_event(EVENT_E);
                         break;
-                case 'A2':
-                case 'a2':
-                        set_event(EVENT_A2);
+                case 'S':
+                case 's':
+                        set_event(EVENT_S);
+                        break;
+                case 'A':
+                case 'a':
+                        set_event(EVENT_A);
                         break;
                 case 'B':
                 case 'b':
-                        set_event(EVENT_B1);
-                        break;
-                case 'B2':
-                case 'b2':
-                        set_event(EVENT_B2);
+                        set_event(EVENT_B);
                         break;
                 case 'C':
                 case 'c':
@@ -367,12 +367,8 @@ int main(int argc, char* argv[])
                 case 'n':
                         set_event(EVENT_N);
                         break;
-        /*      case 'I':
-                case 'i':
-                        set_event(EVENT_I);
-                        break;
                 default:
-                        set_event(EVENT_I+1);
+                        set_event(EVENT_N+1);
                         /* continue; */
                 } 
                 pthread_mutex_lock(&handling_mutex);

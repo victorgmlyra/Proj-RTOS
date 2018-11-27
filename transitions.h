@@ -14,7 +14,7 @@ cb_status finalizar(event_t ev);
 cb_status remover(event_t ev);
 cb_status confirmacao(event_t ev);
 cb_status download(event_t ev);
-cb_status bloqueado(event_t ev);
+cb_status block(event_t ev);
 cb_status negado(event_t ev);
 
 
