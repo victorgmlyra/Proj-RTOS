@@ -27,10 +27,10 @@ extern uint8_t _state_stack_len;
 
 void init_machine(cb_t init_fun);
 
-#define dispatch(ev) (*_p_state)(ev)
-#define push_state(st) *++_p_state = (st)
-#define pop_state() _p_state--
-#define replace_state(st) *_p_state = (st)
+#define dispatch(ev) (*_p_state)(ev)  //manda o argumento do switch para o tratamento
+#define push_state(st) *++_p_state = (st) //incrementa o ponteiro 
+#define pop_state() _p_state-- //decrementa o ponteiro
+#define replace_state(st) *_p_state = (st) //quando a transição vem de um mesmo "pai", ambos tem a mesma linha na hieraquia.
 #define exit_inner_states()                     \
         do {                                    \
                 _p_state += _state_stack_len;   \
