@@ -60,21 +60,13 @@ cb_status negado(event_t ev);
 #define entrada_init_tran() do {                \
                 dispatch(EXIT_EVENT);           \
                 replace_state(aguardo);         \
-                dispatch(ENTRY_EVENT);          \              
+                dispatch(ENTRY_EVENT);          \
         } while (0)
 
 #define saida_init_tran() do {                  \
                 dispatch(EXIT_EVENT);           \
-                replace_state(aguardo):                    \
-                dispatch(ENTRY_EVENT);           \
-        } while (0)
-
-#define adm_principal_tran() do {               \
-                exit_inner_states();            \
-                dispatch(EXIT_EVENT);           \
-                replace_state(principal);       \
+                replace_state(aguardo):         \
                 dispatch(ENTRY_EVENT);          \
-                dispatch(INIT_EVENT);           \
         } while (0)
 
 #define adm_block_tran()  do {                  \
