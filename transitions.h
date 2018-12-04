@@ -59,14 +59,14 @@ cb_status negado(event_t ev);
 
 #define entrada_init_tran() do {                \
                 dispatch(EXIT_EVENT);           \
-                pop_state();                    \
-                dispatch(INIT_EVENT);           \
+                replace_state(aguardo);         \
+                dispatch(ENTRY_EVENT);          \              
         } while (0)
 
 #define saida_init_tran() do {                  \
                 dispatch(EXIT_EVENT);           \
-                pop_state();                    \
-                dispatch(INIT_EVENT);           \
+                replace_state(aguardo):                    \
+                dispatch(ENTRY_EVENT);           \
         } while (0)
 
 #define adm_principal_tran() do {               \
