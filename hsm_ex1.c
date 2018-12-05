@@ -11,7 +11,7 @@
 
 enum {
         EVENT_E = USER_EVENT,           // Entrada com cartão comum
-        EVENT_S,                        // Saída com cartão comum 
+        EVENT_S,                        // Saída com cartão comum
         EVENT_A,                        // Entrada com cartão adm
         EVENT_B,                        // Saída com cartão adm
         EVENT_C,                        // Evento de cadastro
@@ -43,11 +43,11 @@ cb_status principal(event_t ev)
                 return EVENT_HANDLED;
         case EVENT_B:
                 chprintf((BaseSequentialStream*)&SD1, "principal-B; \n");
-                principal_adm_tran();                   
+                principal_adm_tran();
                 return EVENT_HANDLED;
         case EVENT_A:
                 chprintf((BaseSequentialStream*)&SD1, "principal-A; \n");
-                principal_block_tran();                 
+                principal_block_tran();
                 return EVENT_HANDLED;
         }
 
@@ -129,11 +129,11 @@ cb_status adm(event_t ev)
                 return EVENT_HANDLED;
         case EVENT_B:
                 chprintf((BaseSequentialStream*)&SD1, "adm-B; \n");
-                adm_principal_tran();                  
+                adm_principal_tran();
                 return EVENT_HANDLED;
         case EVENT_A:
                 chprintf((BaseSequentialStream*)&SD1, "adm-A; \n");
-                adm_block_tran();                 
+                adm_block_tran();
                 return EVENT_HANDLED;
         case EVENT_C:
                 chprintf((BaseSequentialStream*)&SD1, "adm-C; \n");
@@ -163,7 +163,7 @@ cb_status cadastrar(event_t ev)
                 return EVENT_HANDLED;
         case INIT_EVENT:
                 chprintf((BaseSequentialStream*)&SD1, "cadastrar-INIT; \n");
-                return EVENT_HANDLED;   
+                return EVENT_HANDLED;
         case EVENT_E:
                 chprintf((BaseSequentialStream*)&SD1, "cadastrar-E; \n");
                 cadastrar_finalizar_local_tran();
@@ -184,7 +184,7 @@ cb_status finalizar(event_t ev)
                 return EVENT_HANDLED;
         case INIT_EVENT:
                 chprintf((BaseSequentialStream*)&SD1, "finalizar-INIT; \n");
-                return EVENT_HANDLED;   
+                return EVENT_HANDLED;
         case EVENT_N:
                 chprintf((BaseSequentialStream*)&SD1, "finalzar-N; \n");
                 finalizar_adm_local_tran();
@@ -206,7 +206,7 @@ cb_status remover(event_t ev)
                 return EVENT_HANDLED;
         case INIT_EVENT:
                 chprintf((BaseSequentialStream*)&SD1, "remover-INIT; \n");
-                return EVENT_HANDLED;              
+                return EVENT_HANDLED;
         case EVENT_N:
                 chprintf((BaseSequentialStream*)&SD1, "remover-N; \n");
                 remover_confirmacao_local_tran();
@@ -228,7 +228,7 @@ cb_status confirmacao(event_t ev)
         case INIT_EVENT:
                 chprintf((BaseSequentialStream*)&SD1, "confirmacao-INIT; \n");
                 confirmacao_init_tran();
-                return EVENT_HANDLED;              
+                return EVENT_HANDLED;
         }
 
         return EVENT_NOT_HANDLED;
@@ -246,7 +246,7 @@ cb_status download(event_t ev)
         case INIT_EVENT:
                 chprintf((BaseSequentialStream*)&SD1, "download-INIT; \n");
                 download_init_tran();
-                return EVENT_HANDLED;              
+                return EVENT_HANDLED;
         }
 
         return EVENT_NOT_HANDLED;
@@ -263,10 +263,10 @@ cb_status block(event_t ev)
                 return EVENT_HANDLED;
         case INIT_EVENT:
                 chprintf((BaseSequentialStream*)&SD1, "block-INIT; \n");
-                return EVENT_HANDLED;              
+                return EVENT_HANDLED;
         case EVENT_E:
                 chprintf((BaseSequentialStream*)&SD1, "block-E; \n");
-                block_negado_local_tran();                
+                block_negado_local_tran();
                 return EVENT_HANDLED;
         case EVENT_A:
                 chprintf((BaseSequentialStream*)&SD1, "block-A; \n");
@@ -289,21 +289,21 @@ cb_status negado(event_t ev)
         case INIT_EVENT:
                 chprintf((BaseSequentialStream*)&SD1, "negado-INIT; \n");
                 negado_init_tran();
-                return EVENT_HANDLED;              
+                return EVENT_HANDLED;
         }
 
         return EVENT_NOT_HANDLED;
 }
 
 
-int main(int argc, char* argv[])   
+int main(int argc, char* argv[])
 {
         halInit();
         chSysInit();
         init_machine(init_cb);
-        
+
         while(1){
-            
+
         };
 
         return 0;

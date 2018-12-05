@@ -114,7 +114,7 @@
  * @brief   Enables the MMC_SPI subsystem.
  */
 #if !defined(HAL_USE_MMC_SPI) || defined(__DOXYGEN__)
-#define HAL_USE_MMC_SPI                     FALSE
+#define HAL_USE_MMC_SPI                     TRUE
 #endif
 
 /**
@@ -128,7 +128,7 @@
  * @brief   Enables the QSPI subsystem.
  */
 #if !defined(HAL_USE_QSPI) || defined(__DOXYGEN__)
-#define HAL_USE_QSPI                        FALSE
+#define HAL_USE_QSPI                        TRUE
 #endif
 
 /**
@@ -196,7 +196,7 @@
  * @note    Disabling this option saves both code and data space.
  */
 #if !defined(PAL_USE_CALLBACKS) || defined(__DOXYGEN__)
-#define PAL_USE_CALLBACKS                   FALSE
+#define PAL_USE_CALLBACKS                   TRUE
 #endif
 
 /**
@@ -461,7 +461,7 @@
  * @note    Disabling this option saves both code and data space.
  */
 #if !defined(SPI_USE_CIRCULAR) || defined(__DOXYGEN__)
-#define SPI_USE_CIRCULAR                    FALSE
+#define SPI_USE_CIRCULAR                    TRUE
 #endif
 
 
