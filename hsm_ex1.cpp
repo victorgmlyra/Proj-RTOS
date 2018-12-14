@@ -5,6 +5,8 @@
 #include "sm.h"
 #include "transitions.h"
 #include "chprintf.h"
+#include "src/MFRC522.h"
+
 
 //static const char nome[] PROGMEM = "MENSAGEM";
 //chprintf((BaseSequentialStream*)&SD1, nome);

@@ -31,8 +31,7 @@ void init_machine(cb_t init_fun);
 #define push_state(st) *++_p_state = (st) //incrementa o ponteiro 
 #define pop_state() _p_state-- //decrementa o ponteiro
 #define replace_state(st) *_p_state = (st) //quando a transição vem de um mesmo "pai", ambos tem a mesma linha na hieraquia.
-#define exit_inner_states()                     \ //pop_state até trocar o ramo da arvore
-        do {                                    \
+#define exit_inner_states() do {                \
                 _p_state += _state_stack_len;   \
                 while (_state_stack_len) {      \
                         dispatch(EXIT_EVENT);   \
