@@ -338,8 +338,8 @@ public:
 	// Functions for setting up the Arduino
 	/////////////////////////////////////////////////////////////////////////////////////
 	DEPRECATED_MSG("use MFRC522(uint8_t chipSelectPin, uint8_t resetPowerDownPin)")
-	MFRC522(avr_gpio_registers_t* chipSelectPort, uint8_t chipSelectPad,
-            avr_gpio_registers_t* resetPowerDownPort, uint8_t resetPowerDownPad);
+	MFRC522(volatile avr_gpio_registers_t* chipSelectPort, uint8_t chipSelectPad,
+            volatile avr_gpio_registers_t* resetPowerDownPort, uint8_t resetPowerDownPad);
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Basic interface functions for communicating with the MFRC522
@@ -434,9 +434,9 @@ public:
 	virtual bool PICC_ReadCardSerial();
 	
 protected:
-	avr_gpio_registers_t* _chipSelectPort;		// Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
+	volatile avr_gpio_registers_t* _chipSelectPort;		// Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
 	uint8_t _chipSelectPad;
-	avr_gpio_registers_t* _resetPowerDownPort;	// Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low)
+	volatile avr_gpio_registers_t* _resetPowerDownPort;	// Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low)
 	uint8_t _resetPowerDownPad;
 	StatusCode MIFARE_TwoStepHelper(uint8_t command, uint8_t blockAddr, int32_t data);
 };

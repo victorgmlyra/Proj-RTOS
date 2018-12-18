@@ -304,8 +304,31 @@ int main(int argc, char* argv[])
         chSysInit();
         init_machine(init_cb);
 
-        while(1){
+        palSetPadMode(IOPORT2, PB5, PAL_MODE_OUTPUT_PUSHPULL);     /* SCK. */
+        palSetPadMode(IOPORT2, PB4, PAL_MODE_OUTPUT_PUSHPULL);     /* MISO.*/
+        palSetPadMode(IOPORT2, PB3, PAL_MODE_OUTPUT_PUSHPULL);     /* MOSI.*/
 
+        MFRC522 rfid(IOPORT2, PB2, IOPORT4, PD3);
+        rfid.PCD_Init();
+
+        //chprintf((BaseSequentialStream*)&SD1, "Ta rodando \n");
+        while(1){
+                // Look for new cards
+                if ( ! rfid.PICC_IsNewCardPresent()) {
+                        continue;
+                }
+                // Select one of the cards
+                if ( ! rfid.PICC_ReadCardSerial()) {
+                        continue;
+                }
+                //Mostra UID na serial
+                chprintf((BaseSequentialStream*)&SD1, "UID da tag :");
+                for (uint8_t i = 0; i < rfid.uid.size; i++) 
+                {
+                        chprintf((BaseSequentialStream*)&SD1, rfid.uid.uidByte[i] < 0x10 ? " 0" : " ");
+                        chprintf((BaseSequentialStream*)&SD1, "%x", rfid.uid.uidByte[i]);
+                }
+                chprintf((BaseSequentialStream*)&SD1, "\n");
         };
 
         return 0;

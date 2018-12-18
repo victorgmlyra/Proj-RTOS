@@ -102,11 +102,10 @@ CSRC =  $(KERNSRC)                      \
         $(PLATFORMSRC)                  \
         $(BOARDSRC)                     \
         $(CHIBIOS)/os/various/evtimer.c \
-		$(CHIBIOS)/os/hal/lib/streams/chprintf.c\
-		event.c sm.c 
+		$(CHIBIOS)/os/hal/lib/streams/chprintf.c \
 
 # List C++ sources file here.
-CPPSRC = hsm_ex1.cpp src/MFRC522.cpp 
+CPPSRC = hsm_ex1.cpp src/MFRC522.cpp event.cpp sm.cpp
 
 INCDIR =  $(CHIBIOS)/os/license $(PORTINC) $(KERNINC)  \
           $(HALINC) $(OSALINC) $(PLATFORMINC)          \
