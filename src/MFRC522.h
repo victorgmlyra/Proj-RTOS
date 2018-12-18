@@ -143,8 +143,6 @@ const uint8_t FM17522_firmware_reference[] PROGMEM = {
 	0x56, 0x9A, 0x98, 0x82, 0x26, 0xEA, 0x2A, 0x62
 };
 
-SPIConfig spicfg = {0, IOPORT2, PB2, SPI_CR_DORD_MSB_FIRST | SPI_CR_CPOL_CPHA_MODE(0) | SPI_CR_SCK_FOSC_4, SPI_SR_SCK_FOSC_4};
-
 class MFRC522 {
 public:
 	// Size of the MFRC522 FIFO
@@ -340,7 +338,8 @@ public:
 	// Functions for setting up the Arduino
 	/////////////////////////////////////////////////////////////////////////////////////
 	DEPRECATED_MSG("use MFRC522(uint8_t chipSelectPin, uint8_t resetPowerDownPin)")
-	MFRC522(uint8_t chipSelectPort, uint8_t chipSelectPad, uint8_t resetPowerDownPort, uint8_t resetPowerDownPad);
+	MFRC522(avr_gpio_registers_t* chipSelectPort, uint8_t chipSelectPad,
+            avr_gpio_registers_t* resetPowerDownPort, uint8_t resetPowerDownPad);
 	
 	/////////////////////////////////////////////////////////////////////////////////////
 	// Basic interface functions for communicating with the MFRC522
@@ -404,11 +403,11 @@ public:
 	StatusCode PCD_MIFARE_Transceive(uint8_t *sendData, uint8_t sendLen, bool acceptTimeout = false);
 	// old function used too much memory, now name moved to flash; if you need char, copy from flash to memory
 	//const char *GetStatusCodeName(uint8_t code);
-	static const __FlashStringHelper *GetStatusCodeName(StatusCode code);
+	// static const __FlashStringHelper *GetStatusCodeName(StatusCode code);
 	static PICC_Type PICC_GetType(uint8_t sak);
 	// old function used too much memory, now name moved to flash; if you need char, copy from flash to memory
 	//const char *PICC_GetTypeName(uint8_t type);
-	static const __FlashStringHelper *PICC_GetTypeName(PICC_Type type);
+	// static const __FlashStringHelper *PICC_GetTypeName(PICC_Type type);
 	
 	// Support functions for debuging
 	void PCD_DumpVersionToSerial();
@@ -435,9 +434,9 @@ public:
 	virtual bool PICC_ReadCardSerial();
 	
 protected:
-	uint8_t _chipSelectPort;		// Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
+	avr_gpio_registers_t* _chipSelectPort;		// Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
 	uint8_t _chipSelectPad;
-	uint8_t _resetPowerDownPort;	// Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low)
+	avr_gpio_registers_t* _resetPowerDownPort;	// Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low)
 	uint8_t _resetPowerDownPad;
 	StatusCode MIFARE_TwoStepHelper(uint8_t command, uint8_t blockAddr, int32_t data);
 };

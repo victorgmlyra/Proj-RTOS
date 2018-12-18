@@ -5,9 +5,10 @@
 */
 
 #include "MFRC522.h"
+#include "hal.h"
+#include <string.h>
 
-
-SPIDriver spi;  // Driver para o SPI
+SPIConfig spicfg = {0, IOPORT2, PB2, SPI_CR_DORD_MSB_FIRST | SPI_CR_CPOL_CPHA_MODE(0) | SPI_CR_SCK_FOSC_4, SPI_SR_SCK_FOSC_4};
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Functions for setting up the Arduino
@@ -17,9 +18,9 @@ SPIDriver spi;  // Driver para o SPI
  * Constructor.
  * Prepares the output pins.
  */
-MFRC522::MFRC522(	uint8_t chipSelectPort,		///< Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
+MFRC522::MFRC522(	avr_gpio_registers_t * chipSelectPort,		///< Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
 					uint8_t chipSelectPad,
-					uint8_t resetPowerDownPort,	///< Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low). If there is no connection from the CPU to NRSTPD, set this to UINT8_MAX. In this case, only soft reset will be used in PCD_Init().
+					avr_gpio_registers_t * resetPowerDownPort,	///< Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low). If there is no connection from the CPU to NRSTPD, set this to UINT8_MAX. In this case, only soft reset will be used in PCD_Init().
 					uint8_t resetPowerDownPad
 				) {
 	_chipSelectPort = chipSelectPort;
@@ -39,13 +40,13 @@ MFRC522::MFRC522(	uint8_t chipSelectPort,		///< Arduino pin connected to MFRC522
 void MFRC522::PCD_WriteRegister(	PCD_Register reg,	///< The register to write to. One of the PCD_Register enums.
 									uint8_t value			///< The value to write.
 								) {
-	spiStart(&spi, &spicfg);	//SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));
-	spiAcquireBus(&spi);	// Set the settings to work with SPI bus
+	spiStart(&SPID1, &spicfg);	//SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));
+	spiAcquireBus(&SPID1);	// Set the settings to work with SPI bus
 	palClearPad(_chipSelectPort, _chipSelectPad);		//digitalWrite(_chipSelectPort, LOW);		// Select slave
-	spiSend(&spi, 1, &reg);      //SPI.transfer(reg);						// MSB == 0 is for writing. LSB is not used in address. Datasheet section 8.1.2.3.
-	spiSend(&spi, 1, &value);    //SPI.transfer(value);
+	spiSend(&SPID1, 1, &reg);      //SPI.transfer(reg);						// MSB == 0 is for writing. LSB is not used in address. Datasheet section 8.1.2.3.
+	spiSend(&SPID1, 1, &value);    //SPI.transfer(value);
 	palSetPad(_chipSelectPort, _chipSelectPad);      //digitalWrite(_chipSelectPort, HIGH);		// Release slave again
-	spiReleaseBus(&spi);         //SPI.endTransaction(); // Stop using the SPI bus
+	spiReleaseBus(&SPID1);         //SPI.endTransaction(); // Stop using the SPI bus
 } // End PCD_WriteRegister()
 
 /**
@@ -56,16 +57,16 @@ void MFRC522::PCD_WriteRegister(	PCD_Register reg,	///< The register to write to
 									uint8_t count,			///< The number of bytes to write to the register
 									uint8_t *values		///< The values to write. Byte array.
 								) {
-	spiStart(&spi, &spicfg);      //SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));
-	spiAcquireBus(&spi);	    // Set the settings to work with SPI bus
+	spiStart(&SPID1, &spicfg);      //SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));
+	spiAcquireBus(&SPID1);	    // Set the settings to work with SPI bus
 	palClearPad(_chipSelectPort, _chipSelectPad);    //digitalWrite(_chipSelectPort, LOW);		// Select slave
-	spiSend(&spi, 1, &reg);     //SPI.transfer(reg);			// MSB == 0 is for writing. LSB is not used in address. Datasheet section 8.1.2.3.
+	spiSend(&SPID1, 1, &reg);     //SPI.transfer(reg);			// MSB == 0 is for writing. LSB is not used in address. Datasheet section 8.1.2.3.
 	// for (uint8_t index = 0; index < count; index++) {
 	// 	SPI.transfer(values[index]);
 	// }
-	spiSend(&spi, count, values);
+	spiSend(&SPID1, count, values);
 	palSetPad(_chipSelectPort, _chipSelectPad);   //digitalWrite(_chipSelectPort, HIGH);		// Release slave again
-	spiReleaseBus(&spi);   //SPI.endTransaction(); // Stop using the SPI bus
+	spiReleaseBus(&SPID1);   //SPI.endTransaction(); // Stop using the SPI bus
 } // End PCD_WriteRegister()
 
 /**
@@ -75,14 +76,14 @@ void MFRC522::PCD_WriteRegister(	PCD_Register reg,	///< The register to write to
 uint8_t MFRC522::PCD_ReadRegister(	PCD_Register reg	///< The register to read from. One of the PCD_Register enums.
 								) {
 	uint8_t value;
-	spiStart(&spi, &spicfg);	//SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus
-	spiAcquireBus(&spi); 		//// Set the settings to work with SPI bus
+	spiStart(&SPID1, &spicfg);	//SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus
+	spiAcquireBus(&SPID1); 		//// Set the settings to work with SPI bus
 	palClearPad(_chipSelectPort, _chipSelectPad);     //digitalWrite(_chipSelectPort, LOW);			// Select slave
 	uint8_t reg1 = 0x80 | reg;
-	spiSend(&spi, 1, &reg1); //	SPI.transfer(0x80 | reg); // MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
-	spiReceive (&spi, 1, &value); //value = SPI.transfer(0);					// Read the value back. Send 0 to stop reading.
+	spiSend(&SPID1, 1, &reg1); //	SPI.transfer(0x80 | reg); // MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
+	spiReceive (&SPID1, 1, &value); //value = SPI.transfer(0);					// Read the value back. Send 0 to stop reading.
 	palSetPad(_chipSelectPort, _chipSelectPad);      //digitalWrite(_chipSelectPort, HIGH);			// Release slave again
-	spiReleaseBus(&spi);  		//SPI.endTransaction(); // Stop using the SPI bus
+	spiReleaseBus(&SPID1);  		//SPI.endTransaction(); // Stop using the SPI bus
 	return value;
 } // End PCD_ReadRegister()
 
@@ -102,26 +103,26 @@ void MFRC522::PCD_ReadRegister(	PCD_Register reg,	///< The register to read from
 	uint8_t address = 0x80 | reg;				// MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
 	uint8_t index = 0;							// Index in values array.
 	uint8_t value;
-	spiStart(&spi, &spicfg);	//SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus	palClearPad(_chipSelectPort, _chipSelectPad);     //digitalWrite(_chipSelectPort, LOW);		// Select slave
-	spiAcquireBus(&spi); 		//// Set the settings to work with SPI bus
+	spiStart(&SPID1, &spicfg);	//SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus	palClearPad(_chipSelectPort, _chipSelectPad);     //digitalWrite(_chipSelectPort, LOW);		// Select slave
+	spiAcquireBus(&SPID1); 		//// Set the settings to work with SPI bus
 	count--;								// One read is performed outside of the loop
-	spiSend(&spi, 1, &address); //	SPI.transfer(address); // MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
+	spiSend(&SPID1, 1, &address); //	SPI.transfer(address); // MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
 	if (rxAlign) {		// Only update bit positions rxAlign..7 in values[0]
 		// Create bit mask for bit positions rxAlign..7
 		uint8_t mask = (0xFF << rxAlign) & 0xFF;
 		// Read value and tell that we want to read the same address again.
-		spiExchange(&spi, 1, &address, &value) //uint8_t value = SPI.transfer(address);
+		spiExchange(&SPID1, 1, &address, &value); //uint8_t value = SPI.transfer(address);
 		// Apply mask to both current value of values[0] and the new data in value.
 		values[0] = (values[0] & ~mask) | (value & mask);
 		index++;
 	}
 	while (index < count) {
-		spiExchange(&spi, 1, &address, &values[index]) 		//values[index] = SPI.transfer(address);	// Read value and tell that we want to read the same address again.
+		spiExchange(&SPID1, 1, &address, &values[index]); 		//values[index] = SPI.transfer(address);	// Read value and tell that we want to read the same address again.
 		index++;
 	}
-	spiReceive (&spi, 1, &values[index]);		//values[index] = SPI.transfer(0);	// Read the final uint8_t. Send 0 to stop reading.
+	spiReceive (&SPID1, 1, &values[index]);		//values[index] = SPI.transfer(0);	// Read the final uint8_t. Send 0 to stop reading.
 	palSetPad(_chipSelectPort, _chipSelectPad);      //digitalWrite(_chipSelectPort, HIGH);			// Release slave again
-	spiReleaseBus(&spi);  		//SPI.endTransaction(); // Stop using the SPI bus
+	spiReleaseBus(&SPID1);  		//SPI.endTransaction(); // Stop using the SPI bus
 } // End PCD_ReadRegister()
 
 /**
@@ -393,15 +394,14 @@ void MFRC522::PCD_SoftPowerUp(){
 	uint8_t val = PCD_ReadRegister(CommandReg); // Read state of the command register 
 	val &= ~(1<<4);// set PowerDown bit ( bit 4 ) to 0 
 	PCD_WriteRegister(CommandReg, val);//write new value to the command register
-	// wait until PowerDown bit is cleared (this indicates end of wake up procedure) 
-	const uint32_t timeout = (uint32_t)millis() + 500;// create timer for timeout (just in case) 
-	
-	while(millis()<=timeout){ // set timeout to 500 ms 
-		val = PCD_ReadRegister(CommandReg);// Read state of the command register
-		if(!(val & (1<<4))){ // if powerdown bit is 0 
-			break;// wake up procedure is finished 
+	// wait until PowerDown bit is cleared (this indicates end of wake up procedure)
+    for (int i=0; i<5; i++) {
+        val = PCD_ReadRegister(CommandReg);// Read state of the command register
+		if(!(val & (1<<4))){ // if powerdown bit is 0
+			break;// wake up procedure is finished
 		}
-	}
+		chThdSleepMilliseconds(100);
+    }
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -604,7 +604,7 @@ MFRC522::StatusCode MFRC522::PICC_Select(	Uid *uid,			///< Pointer to Uid struct
 	uint8_t cascadeLevel = 1;
 	MFRC522::StatusCode result;
 	uint8_t count;
-	uint8_t checkBit;make
+	uint8_t checkBit;
 	uint8_t index;
 	uint8_t uidIndex;					// The first index in uid->uidByte[] that is used in the current Cascade Level.
 	int8_t currentLevelKnownBits;		// The number of known UID bits in the current Cascade Level.
@@ -1255,21 +1255,21 @@ MFRC522::StatusCode MFRC522::PCD_MIFARE_Transceive(	uint8_t *sendData,		///< Poi
  * 
  * @return const __FlashStringHelper *
  */
-const __FlashStringHelper *MFRC522::GetStatusCodeName(MFRC522::StatusCode code	///< One of the StatusCode enums.
-										) {
-	switch (code) {
-		case STATUS_OK:				return F("Success.");
-		case STATUS_ERROR:			return F("Error in communication.");
-		case STATUS_COLLISION:		return F("Collission detected.");
-		case STATUS_TIMEOUT:		return F("Timeout in communication.");
-		case STATUS_NO_ROOM:		return F("A buffer is not big enough.");
-		case STATUS_INTERNAL_ERROR:	return F("Internal error in the code. Should not happen.");
-		case STATUS_INVALID:		return F("Invalid argument.");
-		case STATUS_CRC_WRONG:		return F("The CRC_A does not match.");
-		case STATUS_MIFARE_NACK:	return F("A MIFARE PICC responded with NAK.");
-		default:					return F("Unknown error");
-	}
-} // End GetStatusCodeName()
+// const __FlashStringHelper *MFRC522::GetStatusCodeName(MFRC522::StatusCode code	///< One of the StatusCode enums.
+// 										) {
+// 	switch (code) {
+// 		case STATUS_OK:				return F("Success.");
+// 		case STATUS_ERROR:			return F("Error in communication.");
+// 		case STATUS_COLLISION:		return F("Collission detected.");
+// 		case STATUS_TIMEOUT:		return F("Timeout in communication.");
+// 		case STATUS_NO_ROOM:		return F("A buffer is not big enough.");
+// 		case STATUS_INTERNAL_ERROR:	return F("Internal error in the code. Should not happen.");
+// 		case STATUS_INVALID:		return F("Invalid argument.");
+// 		case STATUS_CRC_WRONG:		return F("The CRC_A does not match.");
+// 		case STATUS_MIFARE_NACK:	return F("A MIFARE PICC responded with NAK.");
+// 		default:					return F("Unknown error");
+// 	}
+// } // End GetStatusCodeName()
 
 /**
  * Translates the SAK (Select Acknowledge) to a PICC type.
@@ -1303,23 +1303,23 @@ MFRC522::PICC_Type MFRC522::PICC_GetType(uint8_t sak		///< The SAK uint8_t retur
  * 
  * @return const __FlashStringHelper *
  */
-const __FlashStringHelper *MFRC522::PICC_GetTypeName(PICC_Type piccType	///< One of the PICC_Type enums.
-													) {
-	switch (piccType) {
-		case PICC_TYPE_ISO_14443_4:		return F("PICC compliant with ISO/IEC 14443-4");
-		case PICC_TYPE_ISO_18092:		return F("PICC compliant with ISO/IEC 18092 (NFC)");
-		case PICC_TYPE_MIFARE_MINI:		return F("MIFARE Mini, 320 bytes");
-		case PICC_TYPE_MIFARE_1K:		return F("MIFARE 1KB");
-		case PICC_TYPE_MIFARE_4K:		return F("MIFARE 4KB");
-		case PICC_TYPE_MIFARE_UL:		return F("MIFARE Ultralight or Ultralight C");
-		case PICC_TYPE_MIFARE_PLUS:		return F("MIFARE Plus");
-		case PICC_TYPE_MIFARE_DESFIRE:	return F("MIFARE DESFire");
-		case PICC_TYPE_TNP3XXX:			return F("MIFARE TNP3XXX");
-		case PICC_TYPE_NOT_COMPLETE:	return F("SAK indicates UID is not complete.");
-		case PICC_TYPE_UNKNOWN:
-		default:						return F("Unknown type");
-	}
-} // End PICC_GetTypeName()
+// const __FlashStringHelper *MFRC522::PICC_GetTypeName(PICC_Type piccType	///< One of the PICC_Type enums.
+// 													) {
+// 	switch (piccType) {
+// 		case PICC_TYPE_ISO_14443_4:		return F("PICC compliant with ISO/IEC 14443-4");
+// 		case PICC_TYPE_ISO_18092:		return F("PICC compliant with ISO/IEC 18092 (NFC)");
+// 		case PICC_TYPE_MIFARE_MINI:		return F("MIFARE Mini, 320 bytes");
+// 		case PICC_TYPE_MIFARE_1K:		return F("MIFARE 1KB");
+// 		case PICC_TYPE_MIFARE_4K:		return F("MIFARE 4KB");
+// 		case PICC_TYPE_MIFARE_UL:		return F("MIFARE Ultralight or Ultralight C");
+// 		case PICC_TYPE_MIFARE_PLUS:		return F("MIFARE Plus");
+// 		case PICC_TYPE_MIFARE_DESFIRE:	return F("MIFARE DESFire");
+// 		case PICC_TYPE_TNP3XXX:			return F("MIFARE TNP3XXX");
+// 		case PICC_TYPE_NOT_COMPLETE:	return F("SAK indicates UID is not complete.");
+// 		case PICC_TYPE_UNKNOWN:
+// 		default:						return F("Unknown type");
+// 	}
+// } // End PICC_GetTypeName()
 
 /**
  * Dumps debug info about the connected PCD to Serial.
@@ -1337,11 +1337,12 @@ void MFRC522::PCD_DumpVersionToSerial() {
 		case 0x91: //Serial.println(F(" = v1.0"));     break;
 		case 0x92: //Serial.println(F(" = v2.0"));     break;
 		case 0x12: //Serial.println(F(" = counterfeit chip"));     break;
-		default:   //Serial.println(F(" = (unknown)"));
+		default:   ;//Serial.println(F(" = (unknown)"));
 	}
 	// When 0x00 or 0xFF is returned, communication probably failed
-	if ((v == 0x00) || (v == 0xFF))
+	if ((v == 0x00) || (v == 0xFF)) {
 		//Serial.println(F("WARNING: Communication failure, is the MFRC522 properly connected?"));
+    }
 } // End PCD_DumpVersionToSerial()
 
 /**
@@ -1403,10 +1404,11 @@ void MFRC522::PICC_DumpDetailsToSerial(Uid *uid	///< Pointer to Uid struct retur
 	// UID
 	//Serial.print(F("Card UID:"));
 	for (uint8_t i = 0; i < uid->size; i++) {
-		if(uid->uidByte[i] < 0x10)
+		if(uid->uidByte[i] < 0x10) {
 			//Serial.print(F(" 0"));
-		else
+        } else {
 			//Serial.print(F(" "));
+        }
 		//Serial.print(uid->uidByte[i], HEX);
 	} 
 	//Serial.println();
@@ -1515,24 +1517,26 @@ void MFRC522::PICC_DumpMifareClassicSectorToSerial(Uid *uid,			///< Pointer to U
 		blockAddr = firstBlock + blockOffset;
 		// Sector number - only on first line
 		if (isSectorTrailer) {
-			if(sector < 10)
+			if(sector < 10) {
 				//Serial.print(F("   ")); // Pad with spaces
-			else
-				//Serial.print(F("  ")); // Pad with spaces
-			//Serial.print(sector);
-			//Serial.print(F("   "));
+            } else {
+				;//Serial.print(F("  ")); // Pad with spaces
+            }
+			;//Serial.print(sector);
+			;//Serial.print(F("   "));
 		}
 		else {
 			//Serial.print(F("       "));
 		}
 		// Block number
-		if(blockAddr < 10)
+		if(blockAddr < 10) {
 			//Serial.print(F("   ")); // Pad with spaces
-		else {
-			if(blockAddr < 100)
+        } else {
+			if(blockAddr < 100) {
 				//Serial.print(F("  ")); // Pad with spaces
-			else
+            } else {
 				//Serial.print(F(" ")); // Pad with spaces
+            }
 		}
 		//Serial.print(blockAddr);
 		//Serial.print(F("  "));
@@ -1555,9 +1559,9 @@ void MFRC522::PICC_DumpMifareClassicSectorToSerial(Uid *uid,			///< Pointer to U
 		}
 		// Dump data
 		for (uint8_t index = 0; index < 16; index++) {
-			if(buffer[index] < 0x10)
+			if(buffer[index] < 0x10) {
 				//Serial.print(F(" 0"));
-			else
+            } else
 				//Serial.print(F(" "));
 			//Serial.print(buffer[index], HEX);
 			if ((index % 4) == 3) {
@@ -1636,18 +1640,20 @@ void MFRC522::PICC_DumpMifareUltralightToSerial() {
 		// Dump data
 		for (uint8_t offset = 0; offset < 4; offset++) {
 			i = page + offset;
-			if(i < 10)
+			if(i < 10) {
 				//Serial.print(F("  ")); // Pad with spaces
-			else
+            } else {
 				//Serial.print(F(" ")); // Pad with spaces
+            }
 			//Serial.print(i);
 			//Serial.print(F("  "));
 			for (uint8_t index = 0; index < 4; index++) {
 				i = 4 * offset + index;
-				if(buffer[i] < 0x10)
+				if(buffer[i] < 0x10) {
 					//Serial.print(F(" 0"));
-				else
+                } else {
 					//Serial.print(F(" "));
+                }
 				//Serial.print(buffer[i], HEX);
 			}
 			//Serial.println();
