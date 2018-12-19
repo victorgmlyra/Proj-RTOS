@@ -6,6 +6,9 @@
 #include "transitions.h"
 #include "chprintf.h"
 #include "src/MFRC522.h"
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
 
 //static const char nome[] PROGMEM = "MENSAGEM";
@@ -24,8 +27,7 @@ enum {
 
 cb_status init_cb(event_t ev)
 {
-        static const char msg1[] PROGMEM = "Hermano eh um bom companheiro \n";
-        chprintf((BaseSequentialStream*)&SD1, msg1);
+        chprintf((BaseSequentialStream*)&SD1, "Hermano eh um bom companheiro \n");
         Topo_init_tran();
         return EVENT_HANDLED;
 }
@@ -297,22 +299,25 @@ cb_status negado(event_t ev)
         return EVENT_NOT_HANDLED;
 }
 
+void caps (char cod[20]){
+        
+        for(int i = 0; i < 20; i++){
+                cod[i]=toupper(cod[i]);
+        }
+        
+}
 
-int main(int argc, char* argv[])
-{
-        halInit();
-        chSysInit();
-        init_machine(init_cb);
-
+static THD_WORKING_AREA(waThread1, 32);
+static THD_FUNCTION(Thread1, arg) {
+        (void)arg;
+        chRegSetThreadName("RFID");
         palSetPadMode(IOPORT2, PB5, PAL_MODE_OUTPUT_PUSHPULL);     /* SCK. */
         palSetPadMode(IOPORT2, PB4, PAL_MODE_OUTPUT_PUSHPULL);     /* MISO.*/
         palSetPadMode(IOPORT2, PB3, PAL_MODE_OUTPUT_PUSHPULL);     /* MOSI.*/
-
         MFRC522 rfid(IOPORT2, PB2, IOPORT4, PD3);
         rfid.PCD_Init();
-
-        //chprintf((BaseSequentialStream*)&SD1, "Ta rodando \n");
-        while(1){
+        while (true) {
+                char cod[20] = "";
                 // Look for new cards
                 if ( ! rfid.PICC_IsNewCardPresent()) {
                         continue;
@@ -321,14 +326,40 @@ int main(int argc, char* argv[])
                 if ( ! rfid.PICC_ReadCardSerial()) {
                         continue;
                 }
-                //Mostra UID na serial
-                chprintf((BaseSequentialStream*)&SD1, "UID da tag :");
+                //Mostra UID na serial 
+                //chprintf((BaseSequentialStream*)&SD1, "UID da tag :");
+                char buffer[33];
                 for (uint8_t i = 0; i < rfid.uid.size; i++) 
                 {
-                        chprintf((BaseSequentialStream*)&SD1, rfid.uid.uidByte[i] < 0x10 ? " 0" : " ");
-                        chprintf((BaseSequentialStream*)&SD1, "%x", rfid.uid.uidByte[i]);
+                        //chprintf((BaseSequentialStream*)&SD1, rfid.uid.uidByte[i] < 0x10 ? " 0" : " ");
+                        //chprintf((BaseSequentialStream*)&SD1, "%x", rfid.uid.uidByte[i]);
+                        strcat(cod, (rfid.uid.uidByte[i] < 0x10 ? " 0" : " "));
+                        strcat(cod, itoa(rfid.uid.uidByte[i], buffer, 16));
                 }
-                chprintf((BaseSequentialStream*)&SD1, "\n");
+                caps(cod);
+                //chprintf((BaseSequentialStream*)&SD1, "\n %s \n", cod);
+                
+
+                if(!strcmp (cod," 2E AF 25 D9")){       //chaveiro hermano
+                        set_event(EVENT_B);
+                }
+                if(!strcmp (cod," B0 AC 60 A8")){       // Cartao
+                        set_event(EVENT_E);
+                }
+                chThdSleepMilliseconds(500);
+        }
+}
+
+int main(int argc, char* argv[])
+{
+        halInit();
+        chSysInit();
+        chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO+1, Thread1, NULL);
+
+        init_machine(init_cb);
+        //chprintf((BaseSequentialStream*)&SD1, "Ta rodando \n");
+        while(1){
+                dispatch_event(wait_for_events());
         };
 
         return 0;

@@ -87,6 +87,7 @@ uint8_t MFRC522::PCD_ReadRegister(	PCD_Register reg	///< The register to read fr
 	palSetPad(_chipSelectPort, _chipSelectPad);      //digitalWrite(_chipSelectPort, HIGH);			// Release slave again
 	//spiUnselect(&SPID1);
 	spiReleaseBus(&SPID1);  		//SPI.endTransaction(); // Stop using the SPI bus
+	
 	return value;
 } // End PCD_ReadRegister()
 
@@ -106,7 +107,8 @@ void MFRC522::PCD_ReadRegister(	PCD_Register reg,	///< The register to read from
 	uint8_t address = 0x80 | reg;				// MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
 	uint8_t index = 0;							// Index in values array.
 	uint8_t value;
-	spiStart(&SPID1, &spicfg);	//SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus	palClearPad(_chipSelectPort, _chipSelectPad);     //digitalWrite(_chipSelectPort, LOW);		// Select slave
+	spiStart(&SPID1, &spicfg);	//SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus	
+	palClearPad(_chipSelectPort, _chipSelectPad);     //digitalWrite(_chipSelectPort, LOW);		// Select slave
 	spiAcquireBus(&SPID1); 		//// Set the settings to work with SPI bus
 	count--;								// One read is performed outside of the loop
 	spiSend(&SPID1, 1, &address); //	SPI.transfer(address); // MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
@@ -474,7 +476,6 @@ MFRC522::StatusCode MFRC522::PCD_CommunicateWithPICC(	uint8_t command,		///< The
 	}
 	// 35.7ms and nothing happend. Communication with the MFRC522 might be down.
 	if (i == 0) {
-		chprintf((BaseSequentialStream*)&SD1, "35.7ms nothing happend. Communication down. \n");
 		return STATUS_TIMEOUT;
 	}
 	// Stop now if any errors except collisions were detected.
@@ -736,7 +737,6 @@ MFRC522::StatusCode MFRC522::PICC_Select(	Uid *uid,			///< Pointer to Uid struct
 			if (result == STATUS_COLLISION) { // More than one PICC in the field => collision.
 				uint8_t valueOfCollReg = PCD_ReadRegister(CollReg); // CollReg[7..0] bits are: ValuesAfterColl reserved CollPosNotValid CollPos[4:0]
 				if (valueOfCollReg & 0x20) { // CollPosNotValid
-					chprintf((BaseSequentialStream*)&SD1, "1");
 					return STATUS_COLLISION; // Without a valid collision position we cannot continue
 				}
 				uint8_t collisionPos = valueOfCollReg & 0x1F; // Values 0-31, 0 means bit 32.
@@ -744,7 +744,6 @@ MFRC522::StatusCode MFRC522::PICC_Select(	Uid *uid,			///< Pointer to Uid struct
 					collisionPos = 32;
 				}
 				if (collisionPos <= currentLevelKnownBits) { // No progress - should not happen 
-					chprintf((BaseSequentialStream*)&SD1, "2");
 					return STATUS_INTERNAL_ERROR;
 				}
 				// Choose the PICC with the bit set.
@@ -755,20 +754,17 @@ MFRC522::StatusCode MFRC522::PICC_Select(	Uid *uid,			///< Pointer to Uid struct
 				buffer[index]	|= (1 << checkBit);
 			}
 			else if (result != STATUS_OK) {
-				chprintf((BaseSequentialStream*)&SD1, "erro \n");
 				return result;
 			}
 			else { // STATUS_OK
 				if (currentLevelKnownBits >= 32) { // This was a SELECT.
 					selectDone = true; // No more anticollision 
 					// We continue below outside the while.
-					chprintf((BaseSequentialStream*)&SD1, "true \n");
 				}
 				else { // This was an ANTICOLLISION.
 					// We now have all 32 bits of the UID in this Cascade Level
 					currentLevelKnownBits = 32;
 					// Run loop again to do the SELECT.
-					chprintf((BaseSequentialStream*)&SD1, "frueforçado \n");
 				}
 			}
 		} // End of while (!selectDone)
@@ -782,17 +778,14 @@ MFRC522::StatusCode MFRC522::PICC_Select(	Uid *uid,			///< Pointer to Uid struct
 		
 		// Check response SAK (Select Acknowledge)
 		if (responseLength != 3 || txLastBits != 0) { // SAK must be exactly 24 bits (1 uint8_t + CRC_A).
-			chprintf((BaseSequentialStream*)&SD1, "ERRO 0 \n");
 			return STATUS_ERROR;
 		}
 		// Verify CRC_A - do our own calculation and store the control in buffer[2..3] - those bytes are not needed anymore.
 		result = PCD_CalculateCRC(responseBuffer, 1, &buffer[2]);
 		if (result != STATUS_OK) {
-			chprintf((BaseSequentialStream*)&SD1, "ERRO 1 \n");
 			return result;
 		}
 		if ((buffer[2] != responseBuffer[1]) || (buffer[3] != responseBuffer[2])) {
-			chprintf((BaseSequentialStream*)&SD1, "ERRO 2 \n");
 			return STATUS_CRC_WRONG;
 		}
 		if (responseBuffer[0] & 0x04) { // Cascade bit set - UID not complete yes
